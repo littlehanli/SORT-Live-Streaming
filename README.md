@@ -8,3 +8,34 @@ This is MOT task with live streaming.
 4. Report (20%)
 5. Bonus (10%): supporting multiple bitrates OR trick mode (users can perform
 pause/resume/rewind)
+
+## TODO
+To create live streaming with HTTP Live Streaming (HLS), you will need to
+* Use webcam to capture/encode live video
+* Use your deep learning network model to do segmentation or object tracking
+* Use ffmpeg to transcode the video into .ts
+* Use Stream segmenter or file segmenter to generate a series of small media files (.ts) and an index
+file (.m3u8)
+* To support various bitrates, you can use VariantPlaylistCreator to generate master index file
+(.m3u8)
+* Create HTML file to play the video (or with controls such as play, pause)
+* View the results in a browser that supports HTML5
+
+## Requirements
+### Python Packages
+* Flask
+* motmetrics
+* [cython_bbox](https://blog.csdn.net/qq_19707521/article/details/106692395)
+
+### Others
+* ffmpeg
+
+## Main Files
+* object_tracking.py : load camera and track objects
+* models.py: create module and YOLOv3 model
+* sort.py: detect and tracking
+
+## Usages
+* camera tracking on web
+```python object_tracker.py --ip 0.0.0.0 --port 8000```
+* Access seb [127.0.0.1:8000](127.0.0.1:8000).
