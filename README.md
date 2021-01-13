@@ -32,7 +32,7 @@ file (.m3u8)
 * ffmpeg
 
 ## Main Files
-* SORT-tracking(https://github.com/cfotache/pytorch_objectdetecttrack)
+* SORT-tracking reference (https://github.com/cfotache/pytorch_objectdetecttrack)
 * object_tracking.py : load camera and track objects
 * models.py: create module and YOLOv3 model
 * sort.py: detect and tracking
