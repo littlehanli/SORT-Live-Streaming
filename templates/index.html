@@ -3,12 +3,14 @@
   <head>
     <meta charset="UTF-8">
     <title>Object Tracking Streaming</title>
+    <link href="https://vjs.zencdn.net/7.0.0/video-js.css" rel="stylesheet">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-        <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet" type="text/css">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet" type="text/css">
   </head>
   <body>
     <div id="videoContainer">
       <img src="{{ url_for('video_feed') }}">
+      <video id="videoPlayer" class="video-js vjs-default-skin" controls muted></video>
     </div>
     <div id="selectform" align="center">
       <!--<div>Select tracking ID：<span id="data"></span></div>-->
@@ -18,10 +20,21 @@
       <select class="selectpicker" id="tracking_id" name="tracking_id">        
       </select>
       <input type="submit" class="btn btn-secondary" id="select_id" name="select_id" value="Selected">
-  </div>
+    </div>
   </body>
+  <script src="https://vjs.zencdn.net/7.0.0/video.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.9.1/underscore-min.js"></script> 
-    <script src="{{ url_for('static',filename='js/jquery.min.js') }}"></script>
-    <script src="{{ url_for('static',filename='js/dash.all.min.js') }}"></script>
-    <script src="{{ url_for('static',filename='js/client.js') }}"></script>
+  <script src="{{ url_for('static',filename='js/jquery.min.js') }}"></script>
+  <!--<script src="{{ url_for('static',filename='js/dash.all.min.js') }}"></script>-->
+  <script src="{{ url_for('static',filename='js/client.js') }}"></script>
+  <script>
+    let player = videojs('videoPlayer');
+
+    player.src({
+      src: "{{ url_for('static',filename='data/playlist.m3u8') }}",
+      type: 'application/x-mpegURL',
+      withCredentials: true
+    });
+    player.play();
+  </script>
 </html>

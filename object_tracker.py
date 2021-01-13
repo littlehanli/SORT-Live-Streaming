@@ -44,6 +44,13 @@ model.eval()
 classes = utils.load_classes(class_path)
 Tensor = torch.cuda.FloatTensor
 
+ # initalize frame directory
+cmd_str = f'rmdir /s /q static\\data\\frame'
+os.system(cmd_str)
+os.mkdir(f'static\\data\\frame')
+cmd_str = f'del static\\data\\*.ts'
+os.system(cmd_str)
+
 @app.route("/")
 def index():
 	# return the rendered template
@@ -87,7 +94,8 @@ def detect_image(img):
 def detect_motion():
     # lock variables
     global vs, outputFrame, lock, all_id
-
+    
+    save_dir = 'static/data'
     videopath = 'data/video01.mp4'
 
     colors=[(255,0,0),(0,255,0),(0,0,255),(255,0,255),(128,0,0),(0,128,0),(0,0,128),(128,0,128),(128,128,0),(0,128,128)]
@@ -104,8 +112,10 @@ def detect_motion():
     #vw = frame.shape[1]
     #vh = frame.shape[0]
     #print ("Video size", vw,vh)
-    #outvideo = cv2.VideoWriter(videopath.replace(".mp4", "-det.mp4"),fourcc,20.0,(vw,vh))
 
+    #fourcc = 0x00000021
+    #output_video = cv2.VideoWriter(os.path.join(save_dir,f'video_{counter}.mp4'), fourcc, 20.0, (vw,vh))
+    #counter = 0
     frames = 0
     starttime = time.time()
     mouseX, mouseY = -1, -1
@@ -114,6 +124,19 @@ def detect_motion():
         #ret, frame = vid.read()
         #if not ret:
         #    break
+        if frames % 50 == 0:
+            print('Generating mp4 video...')
+            #output_video.release()
+            output_video_path = osp.join(save_dir, 'video.mp4')
+            cmd_str = 'ffmpeg -r 5 -f image2 -s 720x480 -i {}/%05d.jpg -vcodec libx264 -crf 25  -pix_fmt yuv420p {}'.format(osp.join(save_dir, 'frame'), output_video_path)
+            os.system(cmd_str)
+
+            print('Generating m3u8 file...')
+            cmd_str = 'ffmpeg -i static/data/video.mp4 -c:v libx264 -c:a copy -f hls -segment_list static/data/playlist.m3u8 -segment_list_flags +live -segment_time 10 static/data/%04d.ts'
+            os.system(cmd_str)
+            #counter += 1
+            #output_video = cv2.VideoWriter(os.path.join(save_dir,f'video_{counter}.mp4'), fourcc, 5, (width, height), True)
+
         frame = vs.read()
         frame = imutils.resize(frame, width=800)
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -155,7 +178,8 @@ def detect_motion():
                                         cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 3)
 
         cv2.imshow('Stream', frame)
-        #outvideo.write(frame)
+        cv2.imwrite(os.path.join(save_dir, 'frame', '{:05d}.jpg'.format(frames)), frame)
+        #output_video.write(frame)
         
         cv2.setMouseCallback('Stream', mouse_click)
         ch = 0xFF & cv2.waitKey(1)
@@ -172,7 +196,7 @@ def detect_motion():
     totaltime = time.time()-starttime
     print(frames, "frames", totaltime/frames, "s/frame")
     #cv2.destroyAllWindows()
-    #outvideo.release()
+    output_video.release()
 
 def generate():
     # grab global references to the output frame and lock variables
@@ -208,7 +232,7 @@ def video_feed():
 @app.route('/tracking_list',methods=['GET'])
 def tracking_list():
     #data = [random.randrange(1, 10, 1) for i in range(7)]
-    data = all_id.tolist()
+    data = all_id
     print("---tracking_list", len(data), data)
     if data is not None:
         data.insert(0,'All')
