@@ -5,6 +5,7 @@ from sort import *
 import cv2
 
 import os, sys, time, datetime, random
+import os.path as osp
 import torch
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
@@ -23,6 +24,8 @@ get_data = -1
 
 # initialize a flask object
 app = Flask(__name__)
+app.config['TEMPLATES_AUTO_RELOAD'] = True
+extra_files = ['./static/data/playlist.m3u8']
 
 vs = VideoStream(src=0).start()
 time.sleep(2.0)
@@ -124,19 +127,7 @@ def detect_motion():
         #ret, frame = vid.read()
         #if not ret:
         #    break
-        if frames % 50 == 0:
-            print('Generating mp4 video...')
-            #output_video.release()
-            output_video_path = osp.join(save_dir, 'video.mp4')
-            cmd_str = 'ffmpeg -r 5 -f image2 -s 720x480 -i {}/%05d.jpg -vcodec libx264 -crf 25  -pix_fmt yuv420p {}'.format(osp.join(save_dir, 'frame'), output_video_path)
-            os.system(cmd_str)
-
-            print('Generating m3u8 file...')
-            cmd_str = 'ffmpeg -i static/data/video.mp4 -c:v libx264 -c:a copy -f hls -segment_list static/data/playlist.m3u8 -segment_list_flags +live -segment_time 10 static/data/%04d.ts'
-            os.system(cmd_str)
-            #counter += 1
-            #output_video = cv2.VideoWriter(os.path.join(save_dir,f'video_{counter}.mp4'), fourcc, 5, (width, height), True)
-
+        
         frame = vs.read()
         frame = imutils.resize(frame, width=800)
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -181,10 +172,28 @@ def detect_motion():
         text_scale = max(1, img.shape[1] / 1600.)
         cv2.putText(frame, 'frame: %d num: %d' % (frames, len(all_id)),
                 (0, int(15 * text_scale)), cv2.FONT_HERSHEY_PLAIN, text_scale, (0, 0, 255), thickness=2)
-
+        frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
         cv2.imshow('Stream', frame)
         cv2.imwrite(os.path.join(save_dir, 'frame', '{:05d}.jpg'.format(frames)), frame)
         #output_video.write(frame)
+
+        if frames % 50 == 0:
+            # Remove existed video file
+            if os.path.exists(os.path.join(save_dir, 'video.mp4')):
+                cmd_str = f'del static\\data\\video.mp4'
+                os.system(cmd_str)
+
+            print('Generating mp4 video...')
+            #output_video.release()
+            output_video_path = osp.join(save_dir, 'video.mp4')
+            cmd_str = 'ffmpeg -r 5 -f image2 -s 720x480 -i {}/%05d.jpg -vcodec libx264 -crf 25  -pix_fmt yuv420p {}'.format(osp.join(save_dir, 'frame'), output_video_path)
+            os.system(cmd_str)
+
+            print('Generating m3u8 file...')
+            cmd_str = 'ffmpeg -i static/data/video.mp4 -c:v libx264 -c:a copy -f ssegment -segment_list static/data/playlist.m3u8 -segment_list_flags +live -hls_time 4 static/data/%03d.ts'
+            os.system(cmd_str)
+            #counter += 1
+            #output_video = cv2.VideoWriter(os.path.join(save_dir,f'video_{counter}.mp4'), fourcc, 5, (width, height), True)
         
         #cv2.setMouseCallback('Stream', mouse_click)
         ch = 0xFF & cv2.waitKey(1)
@@ -234,7 +243,7 @@ def video_feed():
 @app.route('/tracking_list',methods=['GET'])
 def tracking_list():
     #data = [random.randrange(1, 10, 1) for i in range(7)]
-    data = all_id
+    data = all_id.tolist()
     print("---tracking_list", len(data), data)
     if data is not None:
         data.insert(0,'All')
@@ -285,7 +294,7 @@ if __name__ == '__main__':
 
     # start the flask app
     app.run(host=args["ip"], port=args["port"], debug=True,
-        threaded=True, use_reloader=False)
+        threaded=True, use_reloader=False, extra_files=extra_files)
     
 # release the video stream pointer
 vs.stop()
