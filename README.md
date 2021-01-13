@@ -24,13 +24,15 @@ file (.m3u8)
 ## Requirements
 ### Python Packages
 * Flask
-* motmetrics
-* [cython_bbox](https://blog.csdn.net/qq_19707521/article/details/106692395)
+* pytorch
+
 
 ### Others
+
 * ffmpeg
 
 ## Main Files
+* SORT-tracking(https://github.com/cfotache/pytorch_objectdetecttrack)
 * object_tracking.py : load camera and track objects
 * models.py: create module and YOLOv3 model
 * sort.py: detect and tracking
@@ -38,4 +40,4 @@ file (.m3u8)
 ## Usages
 * camera tracking on web
 ```python object_tracker.py --ip 0.0.0.0 --port 8000```
-* Access seb [127.0.0.1:8000](127.0.0.1:8000).
+* Access web [127.0.0.1:8000](127.0.0.1:8000).
