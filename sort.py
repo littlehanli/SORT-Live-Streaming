@@ -24,7 +24,6 @@ import numpy as np
 ##import matplotlib.patches as patches
 from skimage import io
 from scipy.optimize import linear_sum_assignment as linear_assignment
-import glob
 import time
 import argparse
 from filterpy.kalman import KalmanFilter

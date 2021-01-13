@@ -150,12 +150,13 @@ def detect_motion():
         pilimg = Image.fromarray(frame)
         detections = detect_image(pilimg)
 
-        frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
         img = np.array(pilimg)
         pad_x = max(img.shape[0] - img.shape[1], 0) * (img_size / max(img.shape))
         pad_y = max(img.shape[1] - img.shape[0], 0) * (img_size / max(img.shape))
         unpad_h = img_size - pad_y
         unpad_w = img_size - pad_x
+
+        # run tracking
         if detections is not None:
             tracked_objects = mot_tracker.update(detections.cpu())
             unique_labels = detections[:, -1].cpu().unique()
@@ -177,16 +178,17 @@ def detect_motion():
                     cv2.putText(frame, cls + "-" + str(int(obj_id)), (x1, y1 - 10), 
                                         cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 3)
 
+        text_scale = max(1, img.shape[1] / 1600.)
+        cv2.putText(frame, 'frame: %d num: %d' % (frames, len(all_id)),
+                (0, int(15 * text_scale)), cv2.FONT_HERSHEY_PLAIN, text_scale, (0, 0, 255), thickness=2)
+
         cv2.imshow('Stream', frame)
         cv2.imwrite(os.path.join(save_dir, 'frame', '{:05d}.jpg'.format(frames)), frame)
         #output_video.write(frame)
         
-        cv2.setMouseCallback('Stream', mouse_click)
+        #cv2.setMouseCallback('Stream', mouse_click)
         ch = 0xFF & cv2.waitKey(1)
-        if ch == 32:
-            print("Cancel selection")
-            select = -1
-
+        
         if ch == 27:
             break
         
