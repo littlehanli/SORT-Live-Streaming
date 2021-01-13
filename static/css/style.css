@@ -1,0 +1,17 @@
+body{
+    height: 100%;
+    margin: 0px;
+    overflow: hidden;
+}
+
+
+#videoContainer{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+#selectform{
+    align-self: center;
+    vertical-align: middle;
+}

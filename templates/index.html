@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Object Tracking Streaming</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+        <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <div id="videoContainer">
+      <img src="{{ url_for('video_feed') }}">
+    </div>
+    <div id="selectform" align="center">
+      <!--<div>Select tracking ID：<span id="data"></span></div>-->
+      <br>
+      <div>Now Tracking At ID:<span id="pick"></span></div>
+      <br>
+      <select class="selectpicker" id="tracking_id" name="tracking_id">        
+      </select>
+      <input type="submit" class="btn btn-secondary" id="select_id" name="select_id" value="Selected">
+  </div>
+  </body>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.9.1/underscore-min.js"></script> 
+    <script src="{{ url_for('static',filename='js/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static',filename='js/dash.all.min.js') }}"></script>
+    <script src="{{ url_for('static',filename='js/client.js') }}"></script>
+</html>
