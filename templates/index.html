@@ -6,16 +6,13 @@
     <link href="https://vjs.zencdn.net/7.0.0/video-js.css" rel="stylesheet">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet" type="text/css">
-    <!--<link href="../static/css/style.css" rel="stylesheet" type="text/css">-->
   </head>
   <body>
     <div id="videoContainer">
       <img src="{{ url_for('video_feed') }}">
-      <!--<img src="../video_feed">-->
       <video id="videoPlayer" class="video-js vjs-default-skin" controls muted></video>
     </div>
     <div id="selectform" align="center">
-      <!--<div>Select tracking ID：<span id="data"></span></div>-->
       <br>
       <div>Now Tracking At ID:<span id="pick"></span></div>
       <br>
@@ -27,16 +24,12 @@
   <script src="https://vjs.zencdn.net/7.0.0/video.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.9.1/underscore-min.js"></script> 
   <script src="{{ url_for('static',filename='js/jquery.min.js') }}"></script>
-  <!--<script src="../static/js/jquery.min.js"></script>-->
-  <!--<script src="{{ url_for('static',filename='js/dash.all.min.js') }}"></script>-->
   <script src="{{ url_for('static',filename='js/client.js') }}"></script>
-  <!--<script src="../static/js/client.js"></script>-->
   <script>
     let player = videojs('videoPlayer');
 
     player.src({
       src: "{{ url_for('static',filename='data/playlist.m3u8') }}",
-      //src: "../static/data/playlist.m3u8",
       type: 'application/x-mpegURL',
       withCredentials: true
     });

@@ -58,20 +58,6 @@ os.system(cmd_str)
 def index():
 	# return the rendered template
 	return render_template("index.html")
-    
-
-def mouse_click(event, x, y, flags, param):
-    global mouseX, mouseY, select
-
-    if event == cv2.EVENT_LBUTTONDOWN:
-        mouseX, mouseY = x, y
-        print('left: ', x, y)
-
-    if event == cv2.EVENT_RBUTTONDOWN:
-        select = -1
-        mouseX, mouseY = -1, -1
-        print('Right: Canceled ', select)
-
 
 def detect_image(img):
     # scale and pad image
@@ -99,38 +85,14 @@ def detect_motion():
     global vs, outputFrame, lock, all_id
     
     save_dir = 'static/data'
-    videopath = 'data/video01.mp4'
 
-    colors=[(255,0,0),(0,255,0),(0,0,255),(255,0,255),(128,0,0),(0,128,0),(0,0,128),(128,0,128),(128,128,0),(0,128,128)]
+    colors=[(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 0, 255), (128, 0, 0), (0, 128, 0), (0, 0, 128), (128, 0, 128), (128, 128, 0), (0, 128, 128)]
 
-    #vid = cv2.VideoCapture(videopath)
-    #vid = cv2.VideoCapture(0)
-    mot_tracker = Sort() 
-
-    #cv2.namedWindow('Stream',cv2.WINDOW_NORMAL)
-    #cv2.resizeWindow('Stream', (800,600))
-
-    #fourcc = cv2.VideoWriter_fourcc(*'XVID')
-    #ret,frame=vid.read()
-    '''frame = vs.read()
-    frame = imutils.resize(frame, width=800)
-    vw = frame.shape[1]
-    vh = frame.shape[0]
-
-    counter = 0
-    fourcc = 0x00000021
-    output_video = cv2.VideoWriter(os.path.join(save_dir,f'video_{counter}.mp4'), fourcc, 5, (vw,vh))'''
-    
+    mot_tracker = Sort()     
     frames = 0
     starttime = time.time()
-    mouseX, mouseY = -1, -1
-    select = -1
 
     while(True):
-        #ret, frame = vid.read()
-        #if not ret:
-        #    break
-        
         frame = vs.read()
         frame = cv2.flip(frame, 1)
         frame = imutils.resize(frame, width=800)
@@ -180,8 +142,6 @@ def detect_motion():
         
         cv2.imshow('Stream', frame)
         cv2.imwrite(os.path.join(save_dir, 'frame', '{:05d}.jpg'.format(frames)), frame)
-        
-        #output_video.write(frame)
 
         if frames % 50 == 0:
             # Remove existed video file
@@ -190,14 +150,14 @@ def detect_motion():
                 os.system(cmd_str)
 
             print('Generating mp4 video...')
-            #output_video.release()
             output_video_path = osp.join(save_dir, 'video.mp4')
             cmd_str = 'ffmpeg -r 5 -f image2 -s 720x480 -i {}/%05d.jpg -vcodec libx264 -crf 25  -pix_fmt yuv420p {}'.format(osp.join(save_dir, 'frame'), output_video_path)
             os.system(cmd_str)
 
             print('Generating m3u8 file...')
-            cmd_str = f'ffmpeg -i static/data/video.mp4 -c:v libx264 -c:a copy -force_key_frames "expr:gte(t,n_forced*10)" -f ssegment -hls_time 10 -segment_list static/data/playlist.m3u8 -hls_list_size 10 -hls_flags append_list+omit_endlist -hls_playlist_type event static/data/%03d.ts'
-            os.system(cmd_str) # -hls_playlist_type event
+            cmd_str = f'ffmpeg -i static/data/video.mp4 -c:v libx264 -c:a copy -force_key_frames "expr:gte(t,n_forced*10)" \
+                            -f ssegment -segment_list static/data/playlist.m3u8 -hls_playlist_type event static/data/%03d.ts'
+            os.system(cmd_str)
 
             # Remove EXT-X-ENDLIST
             if os.path.exists('static/data/playlist.m3u8'):
@@ -208,10 +168,7 @@ def detect_motion():
                 with open('static/data/playlist.m3u8', 'w') as f:
                     for line in lines:
                         f.write(line)
-            #counter += 1
-            #utput_video = cv2.VideoWriter(os.path.join(save_dir,f'video_{counter}.mp4'), fourcc, 5, (vw,vh))
-  
-        #cv2.setMouseCallback('Stream', mouse_click)
+
         ch = 0xFF & cv2.waitKey(1)
         
         if ch == 27:
@@ -222,8 +179,6 @@ def detect_motion():
   
     totaltime = time.time()-starttime
     print(frames, "frames", totaltime/frames, "s/frame")
-    #cv2.destroyAllWindows()
-    #output_video.release()
 
 def generate():
     # grab global references to the output frame and lock variables
