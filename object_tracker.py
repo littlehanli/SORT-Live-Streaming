@@ -112,23 +112,27 @@ def detect_motion():
 
     #fourcc = cv2.VideoWriter_fourcc(*'XVID')
     #ret,frame=vid.read()
-    #vw = frame.shape[1]
-    #vh = frame.shape[0]
-    #print ("Video size", vw,vh)
+    '''frame = vs.read()
+    frame = imutils.resize(frame, width=800)
+    vw = frame.shape[1]
+    vh = frame.shape[0]
 
-    #fourcc = 0x00000021
-    #output_video = cv2.VideoWriter(os.path.join(save_dir,f'video_{counter}.mp4'), fourcc, 20.0, (vw,vh))
-    #counter = 0
+    counter = 0
+    fourcc = 0x00000021
+    output_video = cv2.VideoWriter(os.path.join(save_dir,f'video_{counter}.mp4'), fourcc, 5, (vw,vh))'''
+    
     frames = 0
     starttime = time.time()
     mouseX, mouseY = -1, -1
     select = -1
+
     while(True):
         #ret, frame = vid.read()
         #if not ret:
         #    break
         
         frame = vs.read()
+        frame = cv2.flip(frame, 1)
         frame = imutils.resize(frame, width=800)
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
@@ -173,8 +177,10 @@ def detect_motion():
         cv2.putText(frame, 'frame: %d num: %d' % (frames, len(all_id)),
                 (0, int(15 * text_scale)), cv2.FONT_HERSHEY_PLAIN, text_scale, (0, 0, 255), thickness=2)
         frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+        
         cv2.imshow('Stream', frame)
         cv2.imwrite(os.path.join(save_dir, 'frame', '{:05d}.jpg'.format(frames)), frame)
+        
         #output_video.write(frame)
 
         if frames % 50 == 0:
@@ -190,11 +196,21 @@ def detect_motion():
             os.system(cmd_str)
 
             print('Generating m3u8 file...')
-            cmd_str = 'ffmpeg -i static/data/video.mp4 -c:v libx264 -c:a copy -f ssegment -segment_list static/data/playlist.m3u8 -segment_list_flags +live -hls_time 4 static/data/%03d.ts'
-            os.system(cmd_str)
+            cmd_str = f'ffmpeg -i static/data/video.mp4 -c:v libx264 -c:a copy -force_key_frames "expr:gte(t,n_forced*10)" -f ssegment -hls_time 10 -segment_list static/data/playlist.m3u8 -hls_list_size 10 -hls_flags append_list+omit_endlist -hls_playlist_type event static/data/%03d.ts'
+            os.system(cmd_str) # -hls_playlist_type event
+
+            # Remove EXT-X-ENDLIST
+            if os.path.exists('static/data/playlist.m3u8'):
+                with open('static/data/playlist.m3u8', 'r') as f:
+                    lines = f.readlines()
+                lines = lines[:-1]
+                
+                with open('static/data/playlist.m3u8', 'w') as f:
+                    for line in lines:
+                        f.write(line)
             #counter += 1
-            #output_video = cv2.VideoWriter(os.path.join(save_dir,f'video_{counter}.mp4'), fourcc, 5, (width, height), True)
-        
+            #utput_video = cv2.VideoWriter(os.path.join(save_dir,f'video_{counter}.mp4'), fourcc, 5, (vw,vh))
+  
         #cv2.setMouseCallback('Stream', mouse_click)
         ch = 0xFF & cv2.waitKey(1)
         
@@ -207,7 +223,7 @@ def detect_motion():
     totaltime = time.time()-starttime
     print(frames, "frames", totaltime/frames, "s/frame")
     #cv2.destroyAllWindows()
-    output_video.release()
+    #output_video.release()
 
 def generate():
     # grab global references to the output frame and lock variables
