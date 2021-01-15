@@ -1,5 +1,6 @@
-config/
+config/yolov3.weights
 static/data/*
+!static/data/video01.mp4
 
 
 # Byte-compiled / optimized / DLL files
