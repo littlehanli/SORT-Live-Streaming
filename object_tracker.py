@@ -258,7 +258,6 @@ def video_feed():
 
 @app.route('/tracking_list',methods=['GET'])
 def tracking_list():
-    #data = [random.randrange(1, 10, 1) for i in range(7)]
     data = all_id.tolist()
     print("---tracking_list", len(data), data)
     if data is not None:
@@ -267,7 +266,6 @@ def tracking_list():
     else:
         data = ['All','None']
     print(data)
-    #return str(datetime.datetime.now())  # 示範用
     return jsonify(data)
 
 @app.route('/get_select_id',methods=['GET','POST'])
