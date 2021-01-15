@@ -19,7 +19,7 @@ function process_option_list(v){
         else return e.value
     });
     selectArray = JSON.parse(v)
-    console.log(pastArray)
+    //console.log(pastArray)
     // elements add : selectArray - pastArray
     var add = selectArray.filter(function(x) { return pastArray.indexOf(x) < 0 })
     //console.log(add)

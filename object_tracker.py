@@ -19,7 +19,7 @@ import threading, argparse, imutils
 
 outputFrame = None
 lock = threading.Lock()
-all_id = []
+all_id = np.empty([1])
 get_data = -1
 
 # initialize a flask object
