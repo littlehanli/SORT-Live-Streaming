@@ -27,7 +27,7 @@ This is MOT task with live streaming.
 ## Main Files
 * [SORT-tracking](https://github.com/cfotache/pytorch_objectdetecttrack)
 * [Flask and JPG stream](https://www.pyimagesearch.com/2019/09/02/opencv-stream-video-to-web-browser-html-page/)
-* object_tracking.py : load camera and track objects
+* object_tracking.py : setup server, load camera, and display tracking result
 * models.py: create module and YOLOv3 model
 * sort.py: detect and tracking
 
